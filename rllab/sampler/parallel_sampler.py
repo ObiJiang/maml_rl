@@ -3,7 +3,7 @@ from rllab.sampler.stateful_pool import singleton_pool, SharedGlobal
 from rllab.misc import ext
 from rllab.misc import logger
 from rllab.misc import tensor_utils
-import pickle
+import dill as pickle
 import numpy as np
 
 
