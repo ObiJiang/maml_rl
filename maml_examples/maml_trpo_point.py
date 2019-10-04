@@ -24,6 +24,7 @@ meta_step_size = 0.01
 
 use_maml = True
 
+mtype = 'heun'
 for fast_learning_rate in fast_learning_rates:
     for learning_rate in learning_rates:
         for bas in baselines:
@@ -36,6 +37,7 @@ for fast_learning_rate in fast_learning_rates:
                 grad_step_size=fast_learning_rate,
                 hidden_nonlinearity=tf.nn.relu,
                 hidden_sizes=(100,100),
+                mtype=mtype,
             )
             if bas == 'zero':
                 baseline = ZeroBaseline(env_spec=env.spec)
@@ -53,6 +55,7 @@ for fast_learning_rate in fast_learning_rates:
                 num_grad_updates=num_grad_updates,
                 n_itr=100,
                 use_maml=use_maml,
+                mtype = mtype,
                 step_size=meta_step_size,
                 plot=False,
             )
@@ -62,7 +65,7 @@ for fast_learning_rate in fast_learning_rates:
                 snapshot_mode="last",
                 python_command='python3',
                 seed=1,
-                exp_prefix='vpg_maml_point100',
+                exp_prefix='vpg_maml_point100' + mtype,
                 exp_name='trpomaml'+str(int(use_maml))+'_fbs'+str(fast_batch_size)+'_mbs'+str(meta_batch_size)+'_flr_' + str(fast_learning_rate) + 'metalr_' + str(meta_step_size) +'_step1'+str(num_grad_updates),
                 plot=False,
             )
