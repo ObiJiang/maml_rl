@@ -16,6 +16,8 @@ from sandbox.rocky.tf.samplers.vectorized_sampler import VectorizedSampler
 from sandbox.rocky.tf.spaces import Discrete
 from rllab.sampler.stateful_pool import singleton_pool
 
+from tqdm import tqdm
+
 class BatchMAMLPolopt(RLAlgorithm):
     """
     Base class for batch sampling-based policy optimization methods, with maml.
@@ -149,7 +151,7 @@ class BatchMAMLPolopt(RLAlgorithm):
 
             self.start_worker()
             start_time = time.time()
-            for itr in range(self.start_itr, self.n_itr):
+            for itr in tqdm(range(self.start_itr, self.n_itr)):
                 itr_start_time = time.time()
                 with logger.prefix('itr #%d | ' % itr):
                     logger.log("Sampling set of tasks/goals for this meta-batch...")
