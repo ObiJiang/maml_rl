@@ -16,7 +16,7 @@ stub(globals())
 
 from rllab.misc.instrument import VariantGenerator, variant
 
-
+mtype = 'heun'
 class VG(VariantGenerator):
 
     @variant
@@ -66,6 +66,7 @@ for v in variants:
         grad_step_size=v['fast_lr'],
         hidden_nonlinearity=tf.nn.relu,
         hidden_sizes=(100,100),
+        mtype=mtype,
     )
 
     baseline = LinearFeatureBaseline(env_spec=env.spec)
@@ -79,6 +80,7 @@ for v in variants:
         num_grad_updates=num_grad_updates,
         n_itr=800,
         use_maml=use_maml,
+        mtype = mtype,
         step_size=v['meta_step_size'],
         plot=False,
     )

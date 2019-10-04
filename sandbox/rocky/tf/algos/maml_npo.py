@@ -22,6 +22,7 @@ class MAMLNPO(BatchMAMLPolopt):
             optimizer_args=None,
             step_size=0.01,
             use_maml=True,
+            mtype='midpoint',
             **kwargs):
         assert optimizer is not None  # only for use with MAML TRPO
         if optimizer is None:
@@ -37,6 +38,7 @@ class MAMLNPO(BatchMAMLPolopt):
         self.optimizer = optimizer
         self.step_size = step_size
         self.use_maml = use_maml
+        self.mtype = mtype
         self.kl_constrain_step = -1  # needs to be 0 or -1 (original pol params, or new pol params)
         super(MAMLNPO, self).__init__(**kwargs)
 
@@ -121,7 +123,20 @@ class MAMLNPO(BatchMAMLPolopt):
             surr_objs.append(- tf.reduce_mean(lr*adv_vars[i]))
 
         if self.use_maml:
-            surr_obj = tf.reduce_mean(tf.stack(surr_objs, 0))  # mean over meta_batch_size (the diff tasks)
+            RK1 = tf.stack(all_surr_objs[0], 0)
+            RK2 = tf.stack(surr_objs, 0) 
+
+            if self.mtype == 'heun':
+                a1, a2  = 0.5, 0.5
+            elif self.mtype == 'ralston': 
+                a1, a2  = 1/3, 2/3
+            elif self.mtype == 'itb': 
+                a1, a2  = 2/3, 1/3
+            else:
+                a1, a2  = 0, 1
+            new_obj = a1 * RK1 + a2 * RK2 
+            surr_obj = tf.reduce_mean(new_obj)  # mean over meta_batch_size (the diff tasks)
+        
             input_list += obs_vars + action_vars + adv_vars + old_dist_info_vars_list
         else:
             surr_obj = tf.reduce_mean(tf.stack(all_surr_objs[0], 0)) # if not meta, just use the first surr_obj

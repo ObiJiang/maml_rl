@@ -44,6 +44,7 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
             std_parametrization='exp',
             grad_step_size=1.0,
             stop_grad=False,
+            mtype='midpoint',
     ):
         """
         :param env_spec:
@@ -77,6 +78,7 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
         self.input_shape = (None, obs_dim,)
         self.step_size = grad_step_size
         self.stop_grad = stop_grad
+        self.mtype = mtype
         if type(self.step_size) == list:
             raise NotImplementedError('removing this since it didnt work well')
 
@@ -293,6 +295,13 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
         if self.stop_grad:
             grads = [tf.stop_gradient(grad) for grad in grads]
 
+        if self.mtype == 'heun':
+            step_size = step_size * 2
+        elif self.mtype == 'ralston':
+            step_size = step_size * 3/2
+        elif self.mtype == 'itb':
+            step_size = step_size * 3
+            
         gradients = dict(zip(update_param_keys, grads))
         params_dict = dict(zip(update_param_keys, [old_params_dict[key] - step_size*gradients[key] for key in update_param_keys]))
         for k in no_update_param_keys:
