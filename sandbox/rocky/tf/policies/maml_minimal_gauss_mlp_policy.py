@@ -77,8 +77,17 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
         self.output_nonlinearity = output_nonlinearity
         self.input_shape = (None, obs_dim,)
         self.step_size = grad_step_size
+
         self.stop_grad = stop_grad
         self.mtype = mtype
+
+        if self.mtype == 'heun':
+            self.step_size = self.step_size * 2
+        elif self.mtype == 'ralston':
+            self.step_size = self.step_size * 3/2
+        elif self.mtype == 'itb':
+            self.step_size = self.step_size * 3
+
         if type(self.step_size) == list:
             raise NotImplementedError('removing this since it didnt work well')
 
@@ -196,12 +205,14 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
         if 'all_fast_params_tensor' not in dir(self):
             # make computation graph once
             self.all_fast_params_tensor = []
+            self.all_gradients = []
             for i in range(num_tasks):
                 gradients = dict(zip(update_param_keys, tf.gradients(self.surr_objs[i], [self.all_params[key] for key in update_param_keys])))
                 fast_params_tensor = OrderedDict(zip(update_param_keys, [self.all_params[key] - step_size*gradients[key] for key in update_param_keys]))
                 for k in no_update_param_keys:
                     fast_params_tensor[k] = self.all_params[k]
                 self.all_fast_params_tensor.append(fast_params_tensor)
+                self.all_gradients.append(gradients)
 
         # pull new param vals out of tensorflow, so gradient computation only done once ## first is the vars, second the values
         # these are the updated values of the params after the gradient step
@@ -294,13 +305,6 @@ class MAMLGaussianMLPPolicy(StochasticPolicy, Serializable):
         grads = tf.gradients(surr_obj, [old_params_dict[key] for key in update_param_keys])
         if self.stop_grad:
             grads = [tf.stop_gradient(grad) for grad in grads]
-
-        if self.mtype == 'heun':
-            step_size = step_size * 2
-        elif self.mtype == 'ralston':
-            step_size = step_size * 3/2
-        elif self.mtype == 'itb':
-            step_size = step_size * 3
             
         gradients = dict(zip(update_param_keys, grads))
         params_dict = dict(zip(update_param_keys, [old_params_dict[key] - step_size*gradients[key] for key in update_param_keys]))

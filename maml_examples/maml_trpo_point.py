@@ -34,7 +34,7 @@ for fast_learning_rate in fast_learning_rates:
             policy = MAMLGaussianMLPPolicy(
                 name="policy",
                 env_spec=env.spec,
-                grad_step_size=fast_learning_rate,
+                grad_step_size=fast_learning_rate/3,
                 hidden_nonlinearity=tf.nn.relu,
                 hidden_sizes=(100,100),
                 mtype=mtype,
