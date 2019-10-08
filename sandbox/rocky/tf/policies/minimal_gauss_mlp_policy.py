@@ -65,6 +65,7 @@ class GaussianMLPPolicy(StochasticPolicy, Serializable):
             - softplus: the std will be computed as log(1+exp(x))
         :return:
         """
+        self.all_param_vals = None
         Serializable.quick_init(self, locals())
         assert isinstance(env_spec.action_space, Box)
 
@@ -203,8 +204,8 @@ class GaussianMLPPolicy(StochasticPolicy, Serializable):
 
     # This makes all of the parameters.
     def create_MLP(self, name, output_dim, hidden_sizes,
-                   hidden_W_init=L.XavierUniformInitializer(), hidden_b_init=tf.zeros_initializer,
-                   output_W_init=L.XavierUniformInitializer(), output_b_init=tf.zeros_initializer,
+                   hidden_W_init=L.XavierUniformInitializer(), hidden_b_init=tf.zeros_initializer(),
+                   output_W_init=L.XavierUniformInitializer(), output_b_init=tf.zeros_initializer(),
                    input_shape=None, weight_normalization=False,
                    ):
         assert input_shape is not None

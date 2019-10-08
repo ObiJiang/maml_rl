@@ -22,6 +22,7 @@ class VPG(BatchPolopt, Serializable):
             baseline,
             optimizer=None,
             optimizer_args=None,
+            folder_name = 'test',
             **kwargs):
         Serializable.quick_init(self, locals())
         if optimizer is None:
@@ -36,7 +37,7 @@ class VPG(BatchPolopt, Serializable):
             optimizer = FirstOrderOptimizer(**optimizer_args)
         self.optimizer = optimizer
         self.opt_info = None
-        super(VPG, self).__init__(env=env, policy=policy, baseline=baseline, **kwargs)
+        super(VPG, self).__init__(env=env, policy=policy, baseline=baseline, folder_name = folder_name, **kwargs)
 
     @overrides
     def init_opt(self):

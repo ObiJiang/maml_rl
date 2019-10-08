@@ -20,10 +20,11 @@ def _create_param(spec, shape, name, trainable=True, regularizable=True):
     if regularizable:
         regularizer = None
     else:
-        regularizer = lambda _: tf.constant(0.)
+        regularizer = lambda _ : tf.constant(0.)
+
     return tf.get_variable(
         name=name, shape=shape, initializer=spec, trainable=trainable,
-        regularizer=regularizer, dtype=tf.float32
+        regularizer=regularizer
     )
 
 def add_param(spec, shape, layer_name, name, weight_norm=None, variable_reuse=None, **tags):
@@ -35,7 +36,7 @@ def add_param(spec, shape, layer_name, name, weight_norm=None, variable_reuse=No
         raise NotImplementedError('Not supported.')
     return param
 
-def make_dense_layer(input_shape, num_units, name='fc', W=L.XavierUniformInitializer(), b=tf.zeros_initializer, weight_norm=False, **kwargs):
+def make_dense_layer(input_shape, num_units, name='fc', W=L.XavierUniformInitializer(), b=tf.zeros_initializer(), weight_norm=False, **kwargs):
     # make parameters
     num_inputs = int(np.prod(input_shape[1:]))
     W = add_param(W, (num_inputs, num_units), layer_name=name, name='W', weight_norm=weight_norm)

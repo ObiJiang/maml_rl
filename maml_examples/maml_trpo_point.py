@@ -24,7 +24,7 @@ meta_step_size = 0.01
 
 use_maml = True
 
-mtype = 'heun'
+mtype = 'midpoint'
 for fast_learning_rate in fast_learning_rates:
     for learning_rate in learning_rates:
         for bas in baselines:

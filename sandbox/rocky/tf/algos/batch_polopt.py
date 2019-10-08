@@ -38,6 +38,7 @@ class BatchPolopt(RLAlgorithm):
             force_batch_sampler=False,
             load_policy=None,
             reset_arg=None,
+            folder_name = None, 
             **kwargs
     ):
         """
@@ -79,6 +80,7 @@ class BatchPolopt(RLAlgorithm):
         self.store_paths = store_paths
         self.whole_paths = whole_paths
         self.fixed_horizon = fixed_horizon
+        self.folder_name = folder_name
         if sampler_cls is None:
             #if self.policy.vectorized and not force_batch_sampler:
             #sampler_cls = VectorizedSampler
@@ -143,8 +145,8 @@ class BatchPolopt(RLAlgorithm):
                     logger.record_tabular('Time', time.time() - start_time)
                     logger.record_tabular('ItrTime', time.time() - itr_start_time)
 
-                    #import pickle
-                    #with open('paths_itr'+str(itr)+'.pkl', 'wb') as f:
+                    # import pickle
+                    # with open('./path/' +  self.folder_name +'/paths_itr'+str(itr)+'.pkl', 'wb') as f:
                     #    pickle.dump(paths, f)
 
                     # debugging
@@ -153,13 +155,13 @@ class BatchPolopt(RLAlgorithm):
                         logger.log("Saving visualization of paths")
                         import matplotlib.pyplot as plt;
                         for ind in range(5):
-                            plt.clf(); plt.hold(True)
+                            plt.clf(); # plt.hold(True)
                             points = paths[ind]['observations']
                             plt.plot(points[:,0], points[:,1], '-r', linewidth=2)
                             plt.xlim([-1.0, 1.0])
                             plt.ylim([-1.0, 1.0])
                             plt.legend(['path'])
-                            plt.savefig('/home/cfinn/path'+str(ind)+'.png')
+                            plt.savefig('./path/'+str(ind)+ '_itr_' +str(itr) + '.png')
                     """
                     # end debugging
 
